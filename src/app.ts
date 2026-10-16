@@ -262,7 +262,7 @@ export async function buildApp(prisma: PrismaClient = defaultPrisma): Promise<Fa
   app.get('/assets/welilink-logo.png', async (_request, reply) => {
     if (!config.logoPath) return reply.code(404).send({ error: { code: 'LOGO_NOT_CONFIGURED', message: 'Logo introuvable.' } });
     try {
-      return reply.type('image/png').header('Cache-Control', 'public, max-age=3600').send(await readFile(config.logoPath));
+      return reply.type(/\.jpe?g$/i.test(config.logoPath) ? 'image/jpeg' : 'image/png').header('Cache-Control', 'public, max-age=3600').send(await readFile(config.logoPath));
     } catch {
       return reply.code(404).send({ error: { code: 'LOGO_NOT_FOUND', message: 'Logo introuvable.' } });
     }

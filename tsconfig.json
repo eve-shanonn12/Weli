@@ -11,5 +11,5 @@
     "forceConsistentCasingInFileNames": true,
     "types": ["node"]
   },
-  "include": ["src/**/*.ts", "api/**/*.ts", "prisma/**/*.ts", "scripts/**/*.ts", "test/**/*.ts"]
+  "include": ["src/**/*.ts", "api/**/*.ts", "netlify/**/*.ts", "prisma/**/*.ts", "scripts/**/*.ts", "test/**/*.ts"]
 }

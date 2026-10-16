@@ -34,11 +34,15 @@
     "zod": "3.25.76"
   },
   "devDependencies": {
+    "@netlify/functions": "^6.0.2",
     "@types/node": "22.13.10",
     "@types/pg": "^8.23.1",
     "prisma": "6.16.2",
     "tsx": "4.19.3",
     "typescript": "5.8.3",
     "vitest": "3.1.4"
+  },
+  "overrides": {
+    "light-my-request": "6.6.0"
   }
 }

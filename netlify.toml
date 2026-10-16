@@ -1,0 +1,7 @@
+[build]
+  command = "npx prisma generate"
+  publish = "assets"
+
+[functions]
+  included_files = ["frontend/**", "assets/**", "node_modules/.prisma/client/**"]
+  external_node_modules = ["@prisma/client", ".prisma"]
