@@ -1,0 +1,194 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("SUPABASE_DATABASE_URL")
+  directUrl = env("SUPABASE_DIRECT_URL")
+}
+
+enum Role {
+  BUYER
+  PRODUCER
+  ADMIN
+}
+
+enum ProductKind {
+  FRESH
+  PROCESSED
+}
+
+enum ProductStatus {
+  ACTIVE
+  PAUSED
+  SOLD_OUT
+}
+
+enum RequestStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+  CANCELLATION_REQUESTED
+  CANCELLED
+  COMPLETED
+  EXPIRED
+}
+
+enum PaymentStatus {
+  NONE
+  PENDING
+  INITIATED
+  SUCCEEDED
+  FAILED
+}
+
+enum NotificationType {
+  PURCHASE_REQUEST
+  REQUEST_ACCEPTED
+  REQUEST_REJECTED
+  STOCK_LOW
+  PAYMENT_UPDATE
+  SYSTEM
+}
+
+enum ChatMessageRole {
+  USER
+  ASSISTANT
+}
+
+model User {
+  id                String             @id @default(cuid())
+  name              String
+  phone             String             @unique
+  email             String?            @unique
+  passwordHash      String
+  role              Role               @default(BUYER)
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+  products          Product[]          @relation("ProducerProducts")
+  requestsSent      PurchaseRequest[]  @relation("BuyerRequests")
+  requestsReceived  PurchaseRequest[]  @relation("ProducerRequests")
+  notifications     Notification[]
+  pushSubscriptions PushSubscription[]
+  conversations     ChatConversation[]
+}
+
+model Product {
+  id              String        @id @default(cuid())
+  title           String
+  kind            ProductKind   @default(FRESH)
+  category        String
+  unit            String
+  priceXaf        Int
+  quantity        Int
+  reservedQuantity Int          @default(0)
+  location        String
+  description     String?
+  imageUrl        String?
+  status          ProductStatus @default(ACTIVE)
+  lastStockAt     DateTime      @default(now())
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  producerId      String
+  producer        User          @relation("ProducerProducts", fields: [producerId], references: [id])
+  requests        PurchaseRequest[]
+
+  @@index([kind, category, status])
+  @@index([location])
+  @@index([producerId])
+}
+
+model PurchaseRequest {
+  id              String        @id @default(cuid())
+  quantity        Int
+  unitPriceXaf    Int
+  totalXaf        Int
+  message         String?
+  requestedPickup String?
+  status          RequestStatus @default(PENDING)
+  paymentStatus   PaymentStatus @default(NONE)
+  cancellationEvidence String?
+  cancellationRequestedAt DateTime?
+  completedAt     DateTime?
+  expiresAt       DateTime?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  productId       String
+  buyerId         String
+  producerId      String
+  product         Product       @relation(fields: [productId], references: [id])
+  buyer           User          @relation("BuyerRequests", fields: [buyerId], references: [id])
+  producer        User          @relation("ProducerRequests", fields: [producerId], references: [id])
+  payment         Payment?
+  notifications   Notification[]
+
+  @@index([buyerId, status])
+  @@index([producerId, status])
+  @@index([productId, status])
+}
+
+model Payment {
+  id              String        @id @default(cuid())
+  provider        String
+  phone           String?
+  amountXaf       Int
+  externalReference String?
+  status          PaymentStatus @default(INITIATED)
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  requestId       String        @unique
+  request         PurchaseRequest @relation(fields: [requestId], references: [id])
+}
+
+model Notification {
+  id          String           @id @default(cuid())
+  type        NotificationType
+  title       String
+  body        String
+  readAt      DateTime?
+  createdAt   DateTime         @default(now())
+  userId      String
+  requestId   String?
+  user        User             @relation(fields: [userId], references: [id])
+  request     PurchaseRequest? @relation(fields: [requestId], references: [id])
+
+  @@index([userId, readAt, createdAt])
+}
+
+model PushSubscription {
+  id        String   @id @default(cuid())
+  endpoint  String   @unique
+  p256dh    String
+  auth      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+}
+
+model ChatConversation {
+  id        String        @id @default(cuid())
+  clientKey String        @unique
+  userId    String?
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+  user      User?         @relation(fields: [userId], references: [id], onDelete: SetNull)
+  messages  ChatMessage[]
+
+  @@index([userId, updatedAt])
+}
+
+model ChatMessage {
+  id             String          @id @default(cuid())
+  role           ChatMessageRole
+  content        String
+  provider       String?
+  createdAt      DateTime        @default(now())
+  conversationId String
+  conversation   ChatConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  @@index([conversationId, createdAt])
+}
