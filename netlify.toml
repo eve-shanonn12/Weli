@@ -5,3 +5,7 @@
 [functions]
   included_files = ["frontend/**", "assets/**", "node_modules/.prisma/client/**"]
   external_node_modules = ["@prisma/client", ".prisma"]
+
+[build.environment]
+  # Rate-limit tuning values are not sensitive; keep them out of secrets scanning.
+  SECRETS_SCAN_OMIT_KEYS = "ASSISTANT_RATE_LIMIT_MAX,ASSISTANT_RATE_LIMIT_WINDOW_MS"

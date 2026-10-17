@@ -119,7 +119,7 @@ GEMINI_MODEL="gemini-3.5-flash-lite"
 GEMINI_TIMEOUT_MS=12000
 GEMINI_MAX_OUTPUT_TOKENS=220
 ASSISTANT_RATE_LIMIT_MAX=8
-ASSISTANT_RATE_LIMIT_WINDOW_MS=60000
+ASSISTANT_RATE_LIMIT_WINDOW_MS=your_window_in_ms
 ```
 
 L’application charge `.env` côté serveur. Le chat utilise le SDK officiel Gemini et son API Interactions avec `store: false`. Le modèle par défaut, `gemini-3.5-flash-lite`, privilégie la rapidité et le coût pour ce chat de disponibilité ; il reste configurable par `GEMINI_MODEL`. Si la clé, le quota ou le service ne sont pas disponibles, l’interface affiche une erreur réessayable au lieu de simuler une réponse IA. La clé ne doit jamais être exposée dans le HTML, dans le navigateur ou dans Git. Les messages sont limités à 500 caractères et l’endpoint applique une limite locale par utilisateur ou visiteur.
