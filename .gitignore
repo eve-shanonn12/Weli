@@ -6,3 +6,6 @@ prisma/*.db-journal
 coverage/
 generated/
 *.zip
+
+# Local Netlify folder
+.netlify

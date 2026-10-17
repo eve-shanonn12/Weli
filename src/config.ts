@@ -24,7 +24,7 @@ export const config = {
   requestHoldHours: numberFromEnv(process.env.REQUEST_HOLD_HOURS, 24),
   paymentWebhookSecret: process.env.PAYMENT_WEBHOOK_SECRET ?? 'local-payment-webhook-secret',
   frontendPath: projectFile(process.env.WELILINK_FRONTEND_PATH, 'frontend/welilink-web-home.html'),
-  logoPath: projectFile(process.env.WELILINK_LOGO_PATH, 'assets/welilink-logo.png'),
+  logoPath: projectFile(process.env.WELILINK_LOGO_PATH, 'assets/welilink-logo.jpeg'),
   geminiApiKey: process.env.GEMINI_API_KEY,
   geminiModel: process.env.GEMINI_MODEL ?? 'gemini-3.5-flash-lite',
   geminiTimeoutMs: boundedNumberFromEnv(process.env.GEMINI_TIMEOUT_MS, 12_000, 1_000, 60_000),
